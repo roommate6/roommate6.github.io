@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded | Roommate's Portfolio</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation */
+        nav {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background: #111827;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        nav a:hover,
+        nav a.active {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: #111827;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .card h2 {
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="embedded.html" class="active">Embedded</a>
+    </nav>
+
+    <main class="container">
+        <h1>Embedded Projects</h1>
+
+        <p>
+            This page showcases my embedded systems projects, firmware,
+            electronics, and hardware experiments.
+        </p>
+
+        <div class="card">
+            <h2>Coming Soon</h2>
+
+            <p>
+                This section will contain my embedded projects, including
+                microcontroller programming, RTOS applications, PCB designs,
+                robotics, and other hardware-related work.
+            </p>
+        </div>
+    </main>
+
+</body>
+</html>
