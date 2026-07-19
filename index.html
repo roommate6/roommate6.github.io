@@ -16,15 +16,42 @@
             font-family: Arial, Helvetica, sans-serif;
             background: #0f172a;
             color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation */
+        nav {
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background: #111827;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        nav a {
+            color: #e2e8f0;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        nav a:hover {
+            background: #1e293b;
+        }
+
+        /* Main Content */
+        .container {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: calc(100vh - 50px);
             text-align: center;
             padding: 2rem;
         }
 
-        .container {
+        .content {
             max-width: 700px;
         }
 
@@ -47,7 +74,7 @@
             color: white;
             text-decoration: none;
             border-radius: 8px;
-            transition: background 0.2s ease;
+            transition: background 0.2s;
         }
 
         .button:hover {
@@ -63,21 +90,27 @@
 </head>
 <body>
 
+    <nav>
+        <a href="embedded.html">Embedded</a>
+    </nav>
+
     <main class="container">
-        <h1>Welcome to Roommate's Portfolio</h1>
+        <div class="content">
+            <h1>Welcome to Roommate's Portfolio</h1>
 
-        <p>
-            Hi! This is my personal GitHub portfolio.
-            I'll be adding projects, experiments, and other things I'm working on here.
-        </p>
+            <p>
+                Hi! This is my personal GitHub portfolio.
+                I'll be adding projects, experiments, and other things I'm working on here.
+            </p>
 
-        <a class="button" href="https://github.com/" target="_blank">
-            Visit GitHub
-        </a>
+            <a class="button" href="https://github.com/" target="_blank">
+                Visit GitHub
+            </a>
 
-        <footer>
-            © 2026 Roommate
-        </footer>
+            <footer>
+                © 2026 Roommate
+            </footer>
+        </div>
     </main>
 
 </body>
