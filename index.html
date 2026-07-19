@@ -5,97 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Roommate's Portfolio</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #0f172a;
-            color: #f8fafc;
-            min-height: 100vh;
-        }
-
-        /* Top Navigation */
-        nav {
-            height: 50px;
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            background: #111827;
-            border-bottom: 1px solid #1e293b;
-        }
-
-        nav a {
-            color: #e2e8f0;
-            text-decoration: none;
-            padding: 8px 14px;
-            border-radius: 6px;
-            transition: background 0.2s;
-        }
-
-        nav a:hover {
-            background: #1e293b;
-        }
-
-        /* Main Content */
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: calc(100vh - 50px);
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .content {
-            max-width: 700px;
-        }
-
-        h1 {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            margin-bottom: 1rem;
-        }
-
-        p {
-            font-size: 1.1rem;
-            color: #cbd5e1;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-        }
-
-        .button {
-            display: inline-block;
-            padding: 0.8rem 1.6rem;
-            background: #3b82f6;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-
-        .button:hover {
-            background: #2563eb;
-        }
-
-        footer {
-            margin-top: 3rem;
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
     <nav>
+        <a href="index.html" class="active">Home</a>
         <a href="embedded.html">Embedded</a>
     </nav>
 
-    <main class="container">
-        <div class="content">
+    <main class="center-page">
+        <div class="container">
+
             <h1>Welcome to Roommate's Portfolio</h1>
 
             <p>
@@ -107,11 +28,12 @@
                 Visit GitHub
             </a>
 
-            <footer>
-                © 2026 Roommate
-            </footer>
         </div>
     </main>
+
+    <footer>
+        © 2026 Roommate
+    </footer>
 
 </body>
 </html>
