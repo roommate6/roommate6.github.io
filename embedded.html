@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,62 +8,52 @@
 
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
 
+<body>
     <nav>
         <a href="index.html">Home</a>
         <a href="embedded.html" class="active">Embedded</a>
     </nav>
-
     <main>
+        <div class="container center-page">
+            <div>
+                <h1>Embedded Projects</h1>
 
-        <div class="container">
+                <p>
+                    This page showcases my embedded systems projects, firmware,
+                    electronics, PCB designs, robotics, and other hardware-related work.
+                </p>
 
-            <h1>Embedded Projects</h1>
+                <div class="toolbar">
+                    <input type="text" id="searchBox" placeholder="Search projects...">
 
-            <p>
-                This page showcases my embedded systems projects, firmware,
-                electronics, PCB designs, robotics, and other hardware-related work.
-            </p>
-
-            <div class="toolbar">
-
-                <input
-                    type="text"
-                    id="searchBox"
-                    placeholder="Search projects..."
-                >
-
-                <select id="sortSelect">
-                    <option value="newest">Newest First</option>
-                    <option value="oldest">Oldest First</option>
-                </select>
-
-            </div>
-
-            <div id="projectsContainer">
-
-                <div class="card">
-                    <h2>Coming Soon</h2>
-
-                    <p>
-                        Projects will automatically appear here once they are added
-                        to <code>js/embedded-data.js</code>.
-                    </p>
+                    <select id="sortSelect">
+                        <option vadlue="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
                 </div>
 
+                <div id="projectsContainer">
+                    <div class="card">
+                        <h2>Coming Soon</h2>
+
+                        <p>
+                            Projects will automatically appear here once they are added
+                            to <code>js/embedded-data.js</code>.
+                        </p>
+                    </div>
+
+                </div>
             </div>
-
         </div>
-
     </main>
 
     <footer>
         © 2026 Roommate
     </footer>
 
-    <script src="js/embedded-data.js"></script>
-    <script src="js/embedded-page.js"></script>
-
+    <!-- <script src="js/embedded-data.js"></script>
+    <script src="js/embedded-page.js"></script> -->
 </body>
+
 </html>
