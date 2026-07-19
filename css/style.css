@@ -97,11 +97,12 @@ nav a.active {
 }
 
 .center-page {
-    min-height: calc(100vh - 52px);
-
     display: flex;
     justify-content: center;
     align-items: center;
+
+    min-height: calc(100vh - 52px);
+
     text-align: center;
 }
 
