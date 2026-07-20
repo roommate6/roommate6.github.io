@@ -12,10 +12,8 @@
         dataLayer.push(arguments);
       }
       gtag("js", new Date());
-      gtag("config", "G-0RS25H0VMB", {
-        cookie_flags: "SameSite=None;Secure",
-        cookieFlags: "SameSite=None;Secure",
-      });
+      gtag("set", { cookie_flags: "SameSite=None;Secure" });
+      gtag("config", "G-0RS25H0VMB");
     </script>
 
     <meta charset="UTF-8" />
