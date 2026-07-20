@@ -298,3 +298,108 @@ html::-webkit-scrollbar {
   object-fit: cover;
   display: block;
 }
+
+.embedded-projects-section {
+  width: 100%;
+  padding: 3vh 2vh 5vh;
+  background-color: #f8f4f4;
+}
+
+.embedded-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2.2vh;
+}
+
+.embedded-project-card {
+  background-color: #ffffff;
+  border: 0.2vh solid #e1115a;
+  border-radius: 1.2vh;
+  padding: 2vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+  box-shadow: 0 0.4vh 1vh rgba(0, 0, 0, 0.15);
+}
+
+.embedded-project-media-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1vh;
+}
+
+.embedded-project-media-link {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 0.8vh;
+  background-color: #f3f3f3;
+}
+
+.embedded-project-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background-color: #f3f3f3;
+}
+
+.embedded-project-media-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667278;
+  font-family: "Silkscreen", monospace;
+  font-size: 1.8vh;
+  border: 0.1vh dashed #667278;
+}
+
+.embedded-project-title {
+  font-family: "Silkscreen", monospace;
+  font-size: 2.2vh;
+  color: #e1115a;
+}
+
+.embedded-project-dates {
+  font-family: "Silkscreen", monospace;
+  font-size: 1.5vh;
+  color: #667278;
+}
+
+.embedded-project-description {
+  font-family: "Silkscreen", monospace;
+  font-size: 1.6vh;
+  line-height: 2.1vh;
+  color: #212121;
+}
+
+.embedded-project-description p,
+.embedded-project-description li {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.embedded-project-description ul {
+  padding-left: 2.2vh;
+  margin: 0;
+}
+
+.embedded-project-description strong {
+  color: #e1115a;
+}
+
+.embedded-project-description h1,
+.embedded-project-description h2 {
+  font-family: "Silkscreen", monospace;
+  font-size: 1.8vh;
+  color: #e1115a;
+  margin: 0.4vh 0 0.3vh;
+  font-weight: bold;
+}
+
+.embedded-project-description h1 {
+  font-size: 2vh;
+}
