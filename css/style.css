@@ -8,10 +8,21 @@
   box-sizing: border-box;
 }
 
-a, a:visited {
+a,
+a:visited {
   color: inherit;
   text-decoration: none;
   outline: none;
+}
+
+html {
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
 }
 
 .no-select {
@@ -44,6 +55,7 @@ a, a:visited {
   gap: 1vw;
 
   padding-left: 0.5vh;
+  padding-right: 3vh;
 }
 
 .roommate-logo-image-container {
@@ -54,7 +66,6 @@ a, a:visited {
   align-items: center;
   justify-content: center;
 }
-
 .roommate-logo-image {
   width: 8vh;
   height: 8vh;
@@ -63,7 +74,6 @@ a, a:visited {
     width 90ms ease,
     height 90ms ease;
 }
-
 .roommate-logo-image:hover {
   width: 9vh;
   height: 9vh;
@@ -87,6 +97,32 @@ a, a:visited {
   font-size: 3.2vh;
 }
 
+.main-top-bar-burger-button {
+  width: 5vh;
+  height: 5vh;
+
+  background: transparent;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-left: auto;
+
+  transition: transform 90ms ease;
+}
+.main-top-bar-burger-button:hover {
+  transform: scale(1.08);
+}
+.main-top-bar-burger-button:active {
+  transform: scale(0.92);
+}
+.main-top-bar-burger-image {
+  width: 100%;
+  height: 100%;
+}
+
 .after-main-top-bar-full-filler {
   min-height: 90vh;
   width: 100vw;
@@ -100,13 +136,32 @@ a, a:visited {
   flex-direction: column;
 }
 
+.navigation-menu-container {
+  width: 100vw;
+  height: 50vh;
+  background-color: #e1115a;
+  opacity: 1;
+  overflow: hidden;
+  transition: height 250ms ease, opacity 250ms ease;
+}
+
+.navigation-menu-container.is-open {
+  height: 50vh;
+  opacity: 1;
+}
+
+.navigation-menu-container.is-closed {
+  height: 0;
+  opacity: 0;
+}
+
 .index-my-description-container {
   width: 100vw;
   min-height: 20vh;
 
   background-color: #667278;
 
-  padding: 3vh;
+  padding: 5vh 2vh;
 }
 
 .index-my-description {
@@ -162,7 +217,7 @@ a, a:visited {
   height: 11vh;
   padding: 2vh;
 
-  background-color: #FFFFFF;
+  background-color: #ffffff;
 
   display: flex;
   flex-direction: row;
