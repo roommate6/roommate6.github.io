@@ -1,9 +1,25 @@
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Silkscreen&display=swap");
 
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+a, a:visited {
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .main-container {
@@ -25,7 +41,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 3vw;
+  gap: 1vw;
 
   padding-left: 0.5vh;
 }
@@ -44,8 +60,8 @@
   height: 8vh;
 
   transition:
-    width 90ms ease-out,
-    height 90ms ease-out;
+    width 90ms ease,
+    height 90ms ease;
 }
 
 .roommate-logo-image:hover {
@@ -61,34 +77,18 @@
   cursor: pointer;
 }
 
-.main-top-bar-button {
+.main-top-bar-text {
   color: #f8f4f4;
   text-decoration: none;
 
-  font-family: "Press Start 2P", monospace;
-  letter-spacing: 1vh;
-  font-weight: bold;
-  font-size: 2vh;
-
-  transition: color 90ms ease-out;
-}
-.main-top-bar-button:hover {
-  color: #053106;
-
-  cursor: pointer;
-}
-.main-top-bar-button:active {
-  color: #667278;
-
-  cursor: pointer;
-}
-
-.active-main-top-bar-button {
-  background-color: #8d0031;
+  font-family: "Silkscreen", monospace;
+  letter-spacing: 0.1vh;
+  font-weight: normal;
+  font-size: 3.2vh;
 }
 
 .after-main-top-bar-full-filler {
-  height: 90vh;
+  min-height: 90vh;
   width: 100vw;
   background-color: #f8f4f4;
 }
@@ -100,36 +100,110 @@
   flex-direction: column;
 }
 
-.index-title {
-  max-width: 60vw;
-  min-height: 8vh;
-
-  font-family: "Press Start 2P", monospace;
-  letter-spacing: 0.4vh;
-  font-weight: lighter;
-  font-size: 1.8vh;
-  color: #e1115a;
-
-  margin-top: 20vh;
-}
-
 .index-my-description-container {
-  width: 60vw;
+  width: 100vw;
   min-height: 20vh;
-
-  margin-top: 2vh;
 
   background-color: #667278;
 
-  padding: 2.5vh;
+  padding: 3vh;
 }
 
 .index-my-description {
-  font-family: "Press Start 2P", monospace;
-  letter-spacing: 0.3vh;
-  font-weight: lighter;
-  font-size: 1.2vh;
+  font-family: "Silkscreen", monospace;
+  letter-spacing: 0vh;
+  font-weight: normal;
+  font-size: 1.8vh;
   color: #f8f4f4;
-  line-height: 2vh;
-  text-indent: 2vh;
+  line-height: 1.9vh;
+
+  text-align: justify;
+}
+
+.index-discord-container {
+  width: 100vw;
+  height: 11vh;
+  padding: 2vh;
+
+  background-color: #e0e3ff;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3vh;
+
+  transition: padding 300ms ease;
+}
+.index-discord-container:hover {
+  padding-left: 4vh;
+  cursor: pointer;
+}
+.index-discord-container:active {
+  padding-left: 0.5vh;
+  cursor: pointer;
+}
+
+.index-discord {
+  width: 7vh;
+  height: 7vh;
+}
+
+.index-discord-text {
+  font-family: "Silkscreen", monospace;
+  letter-spacing: 0vh;
+  font-weight: bold;
+  font-size: 2.4vh;
+  color: #5865f2;
+}
+
+.index-youtube-container {
+  width: 100vw;
+  height: 11vh;
+  padding: 2vh;
+
+  background-color: #FFFFFF;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3vh;
+
+  transition: padding 300ms ease;
+}
+.index-youtube-container:hover {
+  padding-left: 4vh;
+  cursor: pointer;
+}
+.index-youtube-container:active {
+  padding-left: 0.5vh;
+  cursor: pointer;
+}
+
+.index-youtube {
+  width: 7vh;
+  height: 7vh;
+}
+
+.index-youtube-text {
+  font-family: "Silkscreen", monospace;
+  letter-spacing: 0vh;
+  font-weight: bold;
+  font-size: 2.4vh;
+  color: #212121;
+}
+
+.square-image-container {
+  width: 30vw;
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.square-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
