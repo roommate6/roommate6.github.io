@@ -230,9 +230,19 @@
                 showStatus('Parsing ASE file...', 'loading');
 
                 const ase = new parseAse(buffer);
+                console.log('ASE Object:', ase);
+                console.log('ASE Keys:', Object.keys(ase));
 
-                if (!ase || !ase.frames || ase.frames.length === 0) {
-                    throw new Error('No frames found in file');
+                if (!ase) {
+                    throw new Error('Failed to parse file');
+                }
+
+                // Try different property names
+                const frames = ase.frames || ase.getFrames?.() || ase.frame || [];
+                console.log('Frames found:', frames.length);
+
+                if (!frames || frames.length === 0) {
+                    throw new Error('No frames found in file. Structure: ' + JSON.stringify(Object.keys(ase)));
                 }
 
                 canvas.width = ase.width;
@@ -241,7 +251,9 @@
                 const ctx = canvas.getContext('2d');
                 const imageData = ctx.createImageData(ase.width, ase.height);
 
-                const firstFrame = ase.frames[0];
+                const firstFrame = frames[0];
+                console.log('First frame:', firstFrame);
+                
                 if (firstFrame.pixels) {
                     imageData.data.set(firstFrame.pixels);
                 } else {
@@ -256,7 +268,7 @@
                     filename: filename,
                     width: ase.width,
                     height: ase.height,
-                    frameCount: ase.frames.length,
+                    frameCount: frames.length,
                     colorDepth: ase.colorDepth || '?',
                     duration: firstFrame.duration || 0
                 });
