@@ -229,7 +229,7 @@
             try {
                 showStatus('Parsing ASE file...', 'loading');
 
-                const ase = parseAse(buffer);
+                const ase = new parseAse(buffer);
 
                 if (!ase || !ase.frames || ase.frames.length === 0) {
                     throw new Error('No frames found in file');
