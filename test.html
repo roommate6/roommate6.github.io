@@ -182,7 +182,7 @@
         <input
           type="text"
           id="filePath"
-          placeholder="e.g., ./sprites/character.ase or https://example.com/file.ase"
+          placeholder="e.g., ./sprites/character.ase"
         />
         <button onclick="loadFromPath()">Load</button>
       </div>
@@ -197,189 +197,470 @@
 
       <div class="url-display">
         <strong>Tip:</strong> Use URL parameter to auto-load:
-        <code>?file=path/to/file.ase</code><br />
-        Example: <code>?file=./sprites/player.ase</code>
+        <code>?file=path/to/file.ase</code>
       </div>
     </div>
 
     <input type="file" id="fileInput" accept=".ase,.aseprite" />
 
     <script type="module">
-      import Aseprite from "https://esm.sh/ase-parser@0.0.18";
+      import pako from "https://cdn.jsdelivr.net/npm/pako@2.1.0/+esm";
 
-      const url = "assets/up_arrow_1.ase";
+      // Wrapper to make ArrayBuffer compatible with Node.js Buffer API
+      class BufferWrapper {
+        constructor(arrayBuffer) {
+          this.arrayBuffer = arrayBuffer;
+          this.dataView = new DataView(arrayBuffer);
+        }
 
-      const response = await fetch(url);
-      console.log(response);
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        readUInt8(offset) {
+          return this.dataView.getUint8(offset);
+        }
+
+        readUInt16LE(offset) {
+          return this.dataView.getUint16(offset, true);
+        }
+
+        readInt16LE(offset) {
+          return this.dataView.getInt16(offset, true);
+        }
+
+        readUInt32LE(offset) {
+          return this.dataView.getUint32(offset, true);
+        }
+
+        readInt32LE(offset) {
+          return this.dataView.getInt32(offset, true);
+        }
+
+        readFloatLE(offset) {
+          return this.dataView.getFloat32(offset, true);
+        }
+
+        toString(
+          encoding = "utf8",
+          start = 0,
+          end = this.arrayBuffer.byteLength,
+        ) {
+          const slice = this.arrayBuffer.slice(start, end);
+          return new TextDecoder(encoding).decode(slice);
+        }
       }
 
-      const buffer = await response.arrayBuffer();
-      console.log(buffer);
+      // Aseprite parser from the ase-parser library
+      class Aseprite {
+        constructor(buffer) {
+          this._offset = 0;
+          this._buffer = new BufferWrapper(buffer);
+          this.frames = [];
+          this.layers = [];
+          this.slices = [];
+          this.fileSize = 0;
+          this.numFrames = 0;
+          this.width = 0;
+          this.height = 0;
+          this.colorDepth = 0;
+          this.paletteIndex = 0;
+          this.numColors = 0;
+          this.pixelRatio = "1:1";
+          this.name = "";
+          this.tags = [];
+          this.tilesets = [];
+        }
 
-      const filename = url.split("/").pop() || "unknown.ase";
-      console.log(filename);
+        readNextByte() {
+          const byte = this._buffer.readUInt8(this._offset);
+          this._offset += 1;
+          return byte;
+        }
 
-      const aseFile = new Aseprite(buffer);
-      console.log(aseFile);
-      console.log(aseFile.numFrames);
+        readNextWord() {
+          const word = this._buffer.readUInt16LE(this._offset);
+          this._offset += 2;
+          return word;
+        }
 
-      aseFile.parse();
-      console.log(aseFile);
-      console.log(aseFile.numFrames);
+        readNextShort() {
+          const short = this._buffer.readInt16LE(this._offset);
+          this._offset += 2;
+          return short;
+        }
 
-      // const canvas = document.getElementById('canvas');
-      // const statusDiv = document.getElementById('status');
-      // const metaInfo = document.getElementById('metaInfo');
-      // const filePathInput = document.getElementById('filePath');
-      // const previewArea = document.getElementById('previewArea');
-      // const fileInput = document.getElementById('fileInput');
+        readNextDWord() {
+          const dword = this._buffer.readUInt32LE(this._offset);
+          this._offset += 4;
+          return dword;
+        }
 
-      // function showStatus(message, type = 'info') {
-      //     statusDiv.className = `status show ${type}`;
-      //     statusDiv.textContent = message;
-      // }
+        readNextLong() {
+          const long = this._buffer.readInt32LE(this._offset);
+          this._offset += 4;
+          return long;
+        }
 
-      // function showMeta(data) {
-      //     metaInfo.className = 'meta show';
-      //     metaInfo.innerHTML = `
-      //         <strong>File:</strong> ${data.filename}<br>
-      //         <strong>Dimensions:</strong> ${data.width}×${data.height}px<br>
-      //         <strong>Frames:</strong> ${data.frameCount}<br>
-      //         <strong>Color Depth:</strong> ${data.colorDepth}-bit<br>
-      //         <strong>First Frame Duration:</strong> ${data.duration}ms
-      //     `;
-      // }
+        readNextFixed() {
+          const fixed = this._buffer.readFloatLE(this._offset);
+          this._offset += 4;
+          return fixed;
+        }
 
-      // async function renderAseprite(buffer, filename) {
-      //     try {
-      //         showStatus('Parsing ASE file...', 'loading');
+        readNextBytes(numBytes) {
+          let str = "";
+          for (let i = 0; i < numBytes; i++) {
+            str += String.fromCharCode(this.readNextByte());
+          }
+          return str;
+        }
 
-      //         const ase = new parseAse(buffer);
-      //         console.log('ASE Object:', ase);
-      //         console.log('ASE Keys:', Object.keys(ase));
+        readNextRawBytes(numBytes) {
+          const bytes = new Uint8Array(numBytes);
+          for (let i = 0; i < numBytes; i++) {
+            bytes[i] = this.readNextByte();
+          }
+          return bytes;
+        }
 
-      //         if (!ase) {
-      //             throw new Error('Failed to parse file');
-      //         }
+        readNextString() {
+          const numBytes = this.readNextWord();
+          return this.readNextBytes(numBytes);
+        }
 
-      //         // Try different property names
-      //         const frames = ase.frames || ase.getFrames?.() || ase.frame || [];
-      //         console.log('Frames found:', frames.length);
+        skipBytes(numBytes) {
+          this._offset += numBytes;
+        }
 
-      //         if (!frames || frames.length === 0) {
-      //             throw new Error('No frames found in file. Structure: ' + JSON.stringify(Object.keys(ase)));
-      //         }
+        #translateFlags(flagValue) {
+          const flagMap = {
+            visible: 0b1,
+            editable: 0b10,
+            lockMovement: 0b100,
+            background: 0b1000,
+            preferLinkedCels: 0b10000,
+            collapsedGroup: 0b100000,
+            reference: 0b1000000,
+          };
+          const result = {};
+          for (const flag in flagMap) {
+            result[flag] = (flagValue & flagMap[flag]) === flagMap[flag];
+          }
+          return result;
+        }
 
-      //         canvas.width = ase.width;
-      //         canvas.height = ase.height;
+        readHeader() {
+          this.fileSize = this.readNextDWord();
+          this.readNextWord(); // magic number
+          this.numFrames = this.readNextWord();
+          this.width = this.readNextWord();
+          this.height = this.readNextWord();
+          this.colorDepth = this.readNextWord();
+          this.skipBytes(14);
+          this.paletteIndex = this.readNextByte();
+          this.skipBytes(3);
+          this.numColors = this.readNextWord();
+          const pixW = this.readNextByte();
+          const pixH = this.readNextByte();
+          this.pixelRatio = `${pixW}:${pixH}`;
+          this.skipBytes(92);
+          return this.numFrames;
+        }
 
-      //         const ctx = canvas.getContext('2d');
-      //         const imageData = ctx.createImageData(ase.width, ase.height);
+        readFrame() {
+          const bytesInFrame = this.readNextDWord();
+          this.skipBytes(2); // magic
+          const oldChunk = this.readNextWord();
+          const frameDuration = this.readNextWord();
+          this.skipBytes(2);
+          const newChunk = this.readNextDWord();
+          let cels = [];
 
-      //         const firstFrame = frames[0];
-      //         console.log('First frame:', firstFrame);
+          for (let i = 0; i < newChunk; i++) {
+            const chunkData = this.readChunk();
+            const chunkType = chunkData.type;
 
-      //         if (firstFrame.pixels) {
-      //             imageData.data.set(firstFrame.pixels);
-      //         } else {
-      //             throw new Error('Frame has no pixel data');
-      //         }
+            switch (chunkType) {
+              case 0x2005:
+                cels.push(this.readCelChunk(chunkData.chunkSize));
+                break;
+              case 0x2004:
+                this.readLayerChunk();
+                break;
+              case 0x2018:
+                this.readFrameTagsChunk();
+                break;
+              case 0x2019:
+                this.palette = this.readPaletteChunk();
+                break;
+              default:
+                this.skipBytes(chunkData.chunkSize - 6);
+            }
+          }
 
-      //         ctx.putImageData(imageData, 0, 0);
+          this.frames.push({
+            bytesInFrame,
+            frameDuration,
+            numChunks: newChunk,
+            cels,
+          });
+        }
 
-      //         showStatus(`✓ Loaded: ${filename}`, 'success');
+        readLayerChunk() {
+          const layer = {};
+          layer.flags = this.#translateFlags(this.readNextWord());
+          layer.type = this.readNextWord();
+          layer.layerChildLevel = this.readNextWord();
+          this.skipBytes(4);
+          layer.blendMode = this.readNextWord();
+          layer.opacity = this.readNextByte();
+          this.skipBytes(3);
+          layer.name = this.readNextString();
+          this.layers.push(layer);
+        }
 
-      //         showMeta({
-      //             filename: filename,
-      //             width: ase.width,
-      //             height: ase.height,
-      //             frameCount: frames.length,
-      //             colorDepth: ase.colorDepth || '?',
-      //             duration: firstFrame.duration || 0
-      //         });
+        readCelChunk(chunkSize) {
+          const layerIndex = this.readNextWord();
+          const x = this.readNextShort();
+          const y = this.readNextShort();
+          const opacity = this.readNextByte();
+          const celType = this.readNextWord();
+          const zIndex = this.readNextShort();
+          this.skipBytes(5);
 
-      //     } catch (error) {
-      //         showStatus(`✗ Error: ${error.message}`, 'error');
-      //         console.error(error);
-      //     }
-      // }
+          if (celType === 1) {
+            return {
+              layerIndex,
+              xpos: x,
+              ypos: y,
+              opacity,
+              celType,
+              zIndex,
+              w: 0,
+              h: 0,
+              rawCelData: undefined,
+              link: this.readNextWord(),
+            };
+          }
 
-      // async function loadFromUrl(url) {
-      //     try {
-      //         showStatus('Fetching file...', 'loading');
+          const w = this.readNextWord();
+          const h = this.readNextWord();
 
-      //         const response = await fetch(url);
-      //         if (!response.ok) {
-      //             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      //         }
+          if (celType === 0 || celType === 2) {
+            const buff = this.readNextRawBytes(chunkSize - 26);
+            return {
+              layerIndex,
+              xpos: x,
+              ypos: y,
+              opacity,
+              celType,
+              zIndex,
+              w,
+              h,
+              rawCelData: celType === 2 ? pako.inflate(buff) : buff,
+            };
+          }
 
-      //         const buffer = await response.arrayBuffer();
-      //         const filename = url.split('/').pop() || 'unknown.ase';
-      //         await renderAseprite(buffer, filename);
+          return {
+            layerIndex,
+            xpos: x,
+            ypos: y,
+            opacity,
+            celType,
+            zIndex,
+            w,
+            h,
+            rawCelData: new Uint8Array(),
+          };
+        }
 
-      //     } catch (error) {
-      //         showStatus(`✗ Failed to load: ${error.message}`, 'error');
-      //         console.error(error);
-      //     }
-      // }
+        readFrameTagsChunk() {
+          const numTags = this.readNextWord();
+          this.skipBytes(8);
+          for (let i = 0; i < numTags; i++) {
+            this.readNextWord(); // from
+            this.readNextWord(); // to
+            this.readNextByte(); // loop
+            this.readNextWord(); // repeat
+            this.skipBytes(6);
+            this.skipBytes(3); // color
+            this.skipBytes(1);
+            this.readNextString(); // name
+          }
+        }
 
-      // async function loadFromFile(file) {
-      //     try {
-      //         showStatus('Reading file...', 'loading');
-      //         const buffer = await file.arrayBuffer();
-      //         await renderAseprite(buffer, file.name);
-      //     } catch (error) {
-      //         showStatus(`✗ Error: ${error.message}`, 'error');
-      //     }
-      // }
+        readPaletteChunk() {
+          const paletteSize = this.readNextDWord();
+          const firstColor = this.readNextDWord();
+          const lastColor = this.readNextDWord();
+          this.skipBytes(8);
+          const colors = [];
+          for (let i = 0; i < paletteSize; i++) {
+            const flag = this.readNextWord();
+            const r = this.readNextByte();
+            const g = this.readNextByte();
+            const b = this.readNextByte();
+            const a = this.readNextByte();
+            colors.push({ r, g, b, a });
+            if (flag === 1) this.readNextString();
+          }
+          return { paletteSize, firstColor, lastColor, colors };
+        }
 
-      // window.loadFromPath = function() {
-      //     const path = filePathInput.value.trim();
-      //     if (!path) {
-      //         showStatus('Please enter a file path', 'error');
-      //         return;
-      //     }
-      //     loadFromUrl(path);
-      // };
+        readChunk() {
+          const chunkSize = this.readNextDWord();
+          const type = this.readNextWord();
+          return { chunkSize, type };
+        }
 
-      // // Check for URL parameter on page load
-      // window.addEventListener('load', () => {
-      //     const params = new URLSearchParams(window.location.search);
-      //     const filePath = params.get('file');
+        parse() {
+          this.readHeader();
+          for (let i = 0; i < this.numFrames; i++) {
+            this.readFrame();
+          }
+          // Link cel references
+          for (let i = 0; i < this.numFrames; i++) {
+            for (let j = 0; j < this.frames[i].cels.length; j++) {
+              const cel = this.frames[i].cels[j];
+              if (cel.link !== undefined) {
+                for (let k = 0; k < this.frames[cel.link].cels.length; k++) {
+                  const srcCel = this.frames[cel.link].cels[k];
+                  if (srcCel.layerIndex === cel.layerIndex) {
+                    cel.w = srcCel.w;
+                    cel.h = srcCel.h;
+                    cel.rawCelData = srcCel.rawCelData;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
 
-      //     if (filePath) {
-      //         filePathInput.value = filePath;
-      //         loadFromUrl(filePath);
-      //     }
-      // });
+      const canvas = document.getElementById("canvas");
+      const statusDiv = document.getElementById("status");
+      const metaInfo = document.getElementById("metaInfo");
+      const filePathInput = document.getElementById("filePath");
+      const previewArea = document.getElementById("previewArea");
+      const fileInput = document.getElementById("fileInput");
 
-      // // Drag and drop
-      // previewArea.addEventListener('dragover', (e) => {
-      //     e.preventDefault();
-      //     previewArea.classList.add('drag-over');
-      // });
+      function showStatus(message, type = "info") {
+        statusDiv.className = `status show ${type}`;
+        statusDiv.textContent = message;
+      }
 
-      // previewArea.addEventListener('dragleave', () => {
-      //     previewArea.classList.remove('drag-over');
-      // });
+      function showMeta(data) {
+        metaInfo.className = "meta show";
+        metaInfo.innerHTML = `
+                <strong>File:</strong> ${data.filename}<br>
+                <strong>Dimensions:</strong> ${data.width}×${data.height}px<br>
+                <strong>Frames:</strong> ${data.frameCount}<br>
+                <strong>Color Depth:</strong> ${data.colorDepth}-bit
+            `;
+      }
 
-      // previewArea.addEventListener('drop', (e) => {
-      //     e.preventDefault();
-      //     previewArea.classList.remove('drag-over');
-      //     if (e.dataTransfer.files[0]) {
-      //         loadFromFile(e.dataTransfer.files[0]);
-      //     }
-      // });
+      function renderAseprite(buffer, filename) {
+        try {
+          showStatus("Parsing ASE file...", "loading");
 
-      // // Click to browse
-      // previewArea.addEventListener('click', () => fileInput.click());
-      // fileInput.addEventListener('change', (e) => {
-      //     if (e.target.files[0]) {
-      //         loadFromFile(e.target.files[0]);
-      //     }
-      // });
+          const ase = new Aseprite(buffer);
+          ase.parse();
+
+          if (!ase.frames || ase.frames.length === 0) {
+            throw new Error("No frames found");
+          }
+
+          canvas.width = ase.width;
+          canvas.height = ase.height;
+
+          const ctx = canvas.getContext("2d");
+          const imageData = ctx.createImageData(ase.width, ase.height);
+          const data = imageData.data;
+
+          const firstFrame = ase.frames[0];
+          if (firstFrame.cels.length > 0) {
+            const cel = firstFrame.cels[0];
+            if (cel.rawCelData && cel.rawCelData.length > 0) {
+              for (let i = 0; i < data.length; i++) {
+                data[i] = cel.rawCelData[i] || 0;
+              }
+            }
+          }
+
+          ctx.putImageData(imageData, 0, 0);
+          showStatus(`✓ Loaded: ${filename}`, "success");
+
+          showMeta({
+            filename,
+            width: ase.width,
+            height: ase.height,
+            frameCount: ase.frames.length,
+            colorDepth: ase.colorDepth,
+          });
+        } catch (error) {
+          showStatus(`✗ Error: ${error.message}`, "error");
+          console.error(error);
+        }
+      }
+
+      async function loadFromUrl(url) {
+        try {
+          showStatus("Fetching file...", "loading");
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const buffer = await response.arrayBuffer();
+          const filename = url.split("/").pop() || "unknown.ase";
+          renderAseprite(buffer, filename);
+        } catch (error) {
+          showStatus(`✗ Failed: ${error.message}`, "error");
+        }
+      }
+
+      async function loadFromFile(file) {
+        try {
+          showStatus("Reading file...", "loading");
+          const buffer = await file.arrayBuffer();
+          renderAseprite(buffer, file.name);
+        } catch (error) {
+          showStatus(`✗ Error: ${error.message}`, "error");
+        }
+      }
+
+      window.loadFromPath = function () {
+        const path = filePathInput.value.trim();
+        if (!path) {
+          showStatus("Enter a file path", "error");
+          return;
+        }
+        loadFromUrl(path);
+      };
+
+      window.addEventListener("load", () => {
+        const params = new URLSearchParams(window.location.search);
+        const filePath = params.get("file");
+        if (filePath) {
+          filePathInput.value = filePath;
+          loadFromUrl(filePath);
+        }
+      });
+
+      previewArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        previewArea.classList.add("drag-over");
+      });
+
+      previewArea.addEventListener("dragleave", () => {
+        previewArea.classList.remove("drag-over");
+      });
+
+      previewArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        previewArea.classList.remove("drag-over");
+        if (e.dataTransfer.files[0]) loadFromFile(e.dataTransfer.files[0]);
+      });
+
+      previewArea.addEventListener("click", () => fileInput.click());
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files[0]) loadFromFile(e.target.files[0]);
+      });
     </script>
   </body>
 </html>
