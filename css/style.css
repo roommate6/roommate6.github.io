@@ -175,12 +175,32 @@ html::-webkit-scrollbar {
 .navigation-menu-link:visited {
   font-family: "Silkscreen", monospace;
   color: #98ff49;
+
+  max-width: 90vw;
+  max-height: 4vh;
+  text-wrap: nowrap;
+  overflow: hidden;
+
   font-size: 4vh;
   line-height: 4vh;
   padding-right: 1vh;
   transition:
     padding 90ms ease,
     color 90ms ease;
+}
+
+@media (max-width: 1025px) {
+  .navigation-menu-link,
+  .navigation-menu-link:visited {
+    font-size: 1.5vh;
+    line-height: 1.5vh;
+    max-height: 1.5vh;
+  }
+
+  .navigation-menu-container.is-open {
+    height: 31.5vh;
+    opacity: 1;
+  }
 }
 
 .navigation-menu-link:hover {

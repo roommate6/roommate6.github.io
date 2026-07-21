@@ -1,5 +1,12 @@
 const projects = [
   {
+    pathToMediaFolder: "assets/media_packs/farm_with_squishy_dumplings",
+    title: "Farm with Squishy Dumplings",
+    startDate: "2026-03",
+    description:
+      "My second attempt of making a Roblox game. This is a Casual game I made with Lnor.",
+  },
+  {
     pathToMediaFolder: "assets/media_packs/battle_quest",
     title: "Battle-Quest",
     startDate: "2025-01",
