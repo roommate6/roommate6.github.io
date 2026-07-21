@@ -110,6 +110,55 @@ async function buildDirectoryMediaPaths(directoryPath) {
   }
 }
 
+function initProjectMediaCarousels() {
+  document.querySelectorAll(".project-media-carousel").forEach((carousel) => {
+    const track = carousel.querySelector(".project-media-track");
+    const slides = carousel.querySelectorAll(".project-media-slide");
+    const prevButton = carousel.querySelector(".project-media-button.prev");
+    const nextButton = carousel.querySelector(".project-media-button.next");
+
+    if (!track || slides.length <= 3) {
+      if (prevButton) prevButton.style.display = "none";
+      if (nextButton) nextButton.style.display = "none";
+      return;
+    }
+
+    let pageIndex = 0;
+    const pageSize = 3;
+    const maxPageIndex = Math.max(0, Math.ceil(slides.length / pageSize) - 1);
+
+    const updateCarousel = () => {
+      track.style.transform = `translateX(-${pageIndex * 100}%)`;
+
+      if (prevButton) {
+        prevButton.disabled = pageIndex === 0;
+        prevButton.classList.toggle("is-disabled", pageIndex === 0);
+      }
+
+      if (nextButton) {
+        nextButton.disabled = pageIndex >= maxPageIndex;
+        nextButton.classList.toggle("is-disabled", pageIndex >= maxPageIndex);
+      }
+    };
+
+    prevButton?.addEventListener("click", () => {
+      if (pageIndex > 0) {
+        pageIndex -= 1;
+        updateCarousel();
+      }
+    });
+
+    nextButton?.addEventListener("click", () => {
+      if (pageIndex < maxPageIndex) {
+        pageIndex += 1;
+        updateCarousel();
+      }
+    });
+
+    updateCarousel();
+  });
+}
+
 async function renderProjects(htmlProjectsListElement, projects) {
   const cards = await Promise.all(
     projects.map(async (project) => {
@@ -127,7 +176,27 @@ async function renderProjects(htmlProjectsListElement, projects) {
 
       const mediasMarkup =
         normalizedMedias && normalizedMedias.length > 0
-          ? `<div class="project-media-row">${normalizedMedias.map(renderMedia).join("")}</div>`
+          ? `
+            <div class="project-media-carousel">
+              <div class="project-media-viewport">
+                <div class="project-media-track">
+                  ${normalizedMedias
+                    .map(
+                      (mediaPath) => `
+                        <div class="project-media-slide">
+                          ${renderMedia(mediaPath)}
+                        </div>
+                      `,
+                    )
+                    .join("")}
+                </div>
+              </div>
+              <div class="project-media-controls">
+                <button class="project-media-button prev" type="button" aria-label="Previous media">‹</button>
+                <button class="project-media-button next" type="button" aria-label="Next media">›</button>
+              </div>
+            </div>
+          `
           : "";
 
       const dateRange = [project.startDate, project.endDate]
@@ -146,4 +215,5 @@ async function renderProjects(htmlProjectsListElement, projects) {
   );
 
   htmlProjectsListElement.innerHTML = cards.join("");
+  initProjectMediaCarousels();
 }

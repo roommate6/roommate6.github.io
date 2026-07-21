@@ -342,10 +342,25 @@ html::-webkit-scrollbar {
   box-shadow: 0 0.4vh 1vh rgba(0, 0, 0, 0.15);
 }
 
-.project-media-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1vh;
+.project-media-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8vh;
+}
+
+.project-media-viewport {
+  overflow: hidden;
+  border-radius: 0.8vh;
+}
+
+.project-media-track {
+  display: flex;
+  transition: transform 220ms ease;
+}
+
+.project-media-slide {
+  flex: 0 0 calc(100% / 3);
+  padding: 0.2vh;
 }
 
 .project-media-link {
@@ -363,6 +378,42 @@ html::-webkit-scrollbar {
   object-fit: cover;
   display: block;
   background-color: #f3f3f3;
+}
+
+.project-media-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.8vh;
+}
+
+.project-media-button {
+  border: none;
+  background-color: #e1115a;
+  color: #ffffff;
+  width: 3.2vh;
+  height: 3.2vh;
+  border-radius: 999px;
+  font-family: "Silkscreen", monospace;
+  font-size: 2vh;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 90ms ease, opacity 90ms ease;
+}
+
+.project-media-button:hover {
+  transform: scale(1.04);
+}
+
+.project-media-button:active {
+  transform: scale(0.96);
+}
+
+.project-media-button.is-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .project-media-fallback {
