@@ -201,7 +201,6 @@
 
     <script type="module">
         import parseAse from 'https://esm.sh/ase-parser@0.0.18';
-        window.parseAse = parseAse;
         
         const canvas = document.getElementById('canvas');
         const statusDiv = document.getElementById('status');
@@ -226,11 +225,11 @@
             `;
         }
 
-        window.renderAseprite = async function(buffer, filename) {
+        async function renderAseprite(buffer, filename) {
             try {
                 showStatus('Parsing ASE file...', 'loading');
 
-                const ase = window.parseAse(buffer);
+                const ase = parseAse(buffer);
 
                 if (!ase || !ase.frames || ase.frames.length === 0) {
                     throw new Error('No frames found in file');
@@ -266,9 +265,9 @@
                 showStatus(`✗ Error: ${error.message}`, 'error');
                 console.error(error);
             }
-        };
+        }
 
-        window.loadFromUrl = async function(url) {
+        async function loadFromUrl(url) {
             try {
                 showStatus('Fetching file...', 'loading');
 
@@ -279,23 +278,23 @@
 
                 const buffer = await response.arrayBuffer();
                 const filename = url.split('/').pop() || 'unknown.ase';
-                await window.renderAseprite(buffer, filename);
+                await renderAseprite(buffer, filename);
 
             } catch (error) {
                 showStatus(`✗ Failed to load: ${error.message}`, 'error');
                 console.error(error);
             }
-        };
+        }
 
-        window.loadFromFile = async function(file) {
+        async function loadFromFile(file) {
             try {
                 showStatus('Reading file...', 'loading');
                 const buffer = await file.arrayBuffer();
-                await window.renderAseprite(buffer, file.name);
+                await renderAseprite(buffer, file.name);
             } catch (error) {
                 showStatus(`✗ Error: ${error.message}`, 'error');
             }
-        };
+        }
 
         window.loadFromPath = function() {
             const path = filePathInput.value.trim();
@@ -303,7 +302,7 @@
                 showStatus('Please enter a file path', 'error');
                 return;
             }
-            window.loadFromUrl(path);
+            loadFromUrl(path);
         };
 
         // Check for URL parameter on page load
@@ -313,7 +312,7 @@
 
             if (filePath) {
                 filePathInput.value = filePath;
-                window.loadFromUrl(filePath);
+                loadFromUrl(filePath);
             }
         });
 
@@ -331,7 +330,7 @@
             e.preventDefault();
             previewArea.classList.remove('drag-over');
             if (e.dataTransfer.files[0]) {
-                window.loadFromFile(e.dataTransfer.files[0]);
+                loadFromFile(e.dataTransfer.files[0]);
             }
         });
 
@@ -339,7 +338,7 @@
         previewArea.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
             if (e.target.files[0]) {
-                window.loadFromFile(e.target.files[0]);
+                loadFromFile(e.target.files[0]);
             }
         });
     </script>
