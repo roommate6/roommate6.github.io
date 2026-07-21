@@ -40,7 +40,12 @@ function formatDescription(description) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  const paragraphs = escaped
+  const withLinks = escaped.replace(
+    /(https?:\/\/[^\s]+)/g,
+    '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+  );
+
+  const paragraphs = withLinks
     .split(/\n\s*\n/)
     .map((paragraph) => paragraph.trim())
     .filter(Boolean);

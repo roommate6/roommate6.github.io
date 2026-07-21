@@ -411,6 +411,11 @@ html::-webkit-scrollbar {
   color: #e1115a;
 }
 
+.project-description a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
 .project-description h1,
 .project-description h2 {
   font-family: "Silkscreen", monospace;
