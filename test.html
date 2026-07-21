@@ -553,11 +553,12 @@
                 <strong>File:</strong> ${data.filename}<br>
                 <strong>Dimensions:</strong> ${data.width}×${data.height}px<br>
                 <strong>Frames:</strong> ${data.frameCount}<br>
+                <strong>Layers:</strong> ${data.layerCount} • <strong>CELs in frame 1:</strong> ${data.celCount}<br>
                 <strong>Color Depth:</strong> ${data.colorDepth}-bit
             `;
       }
 
-      // Render 32-bit RGBA pixels
+      // Render 32-bit RGBA pixels with alpha blending
       function renderRGBA(imageData, cel, ase) {
         const width = ase.width;
         const height = ase.height;
@@ -566,17 +567,42 @@
         const celHeight = cel.h;
         const xPos = cel.xpos;
         const yPos = cel.ypos;
+        const opacity = cel.opacity / 255;
 
-        for (let y = 0; y < celHeight && yPos + y < height; y++) {
-          for (let x = 0; x < celWidth && xPos + x < width; x++) {
+        for (let y = 0; y < celHeight; y++) {
+          const canvasY = yPos + y;
+          if (canvasY < 0 || canvasY >= height) continue;
+
+          for (let x = 0; x < celWidth; x++) {
+            const canvasX = xPos + x;
+            if (canvasX < 0 || canvasX >= width) continue;
+
             const srcIdx = (y * celWidth + x) * 4;
-            const dstIdx = ((yPos + y) * width + (xPos + x)) * 4;
+            const dstIdx = (canvasY * width + canvasX) * 4;
 
             if (srcIdx + 3 < celData.length && dstIdx + 3 < imageData.length) {
-              imageData[dstIdx] = celData[srcIdx]; // R
-              imageData[dstIdx + 1] = celData[srcIdx + 1]; // G
-              imageData[dstIdx + 2] = celData[srcIdx + 2]; // B
-              imageData[dstIdx + 3] = celData[srcIdx + 3]; // A
+              const srcA = (celData[srcIdx + 3] / 255) * opacity;
+              if (srcA > 0) {
+                const dstA = imageData[dstIdx + 3] / 255;
+                const outA = srcA + dstA * (1 - srcA);
+
+                imageData[dstIdx] = Math.round(
+                  (celData[srcIdx] * srcA +
+                    imageData[dstIdx] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 1] = Math.round(
+                  (celData[srcIdx + 1] * srcA +
+                    imageData[dstIdx + 1] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 2] = Math.round(
+                  (celData[srcIdx + 2] * srcA +
+                    imageData[dstIdx + 2] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 3] = Math.round(outA * 255);
+              }
             }
           }
         }
@@ -591,11 +617,18 @@
         const celHeight = cel.h;
         const xPos = cel.xpos;
         const yPos = cel.ypos;
+        const opacity = cel.opacity / 255;
 
-        for (let y = 0; y < celHeight && yPos + y < height; y++) {
-          for (let x = 0; x < celWidth && xPos + x < width; x++) {
+        for (let y = 0; y < celHeight; y++) {
+          const canvasY = yPos + y;
+          if (canvasY < 0 || canvasY >= height) continue;
+
+          for (let x = 0; x < celWidth; x++) {
+            const canvasX = xPos + x;
+            if (canvasX < 0 || canvasX >= width) continue;
+
             const srcIdx = (y * celWidth + x) * 2;
-            const dstIdx = ((yPos + y) * width + (xPos + x)) * 4;
+            const dstIdx = (canvasY * width + canvasX) * 4;
 
             if (srcIdx + 1 < celData.length && dstIdx + 3 < imageData.length) {
               const pixel = celData[srcIdx] | (celData[srcIdx + 1] << 8);
@@ -603,10 +636,28 @@
               const g = (pixel >> 5) & 0x3f;
               const b = pixel & 0x1f;
 
-              imageData[dstIdx] = (r << 3) | (r >> 2);
-              imageData[dstIdx + 1] = (g << 2) | (g >> 4);
-              imageData[dstIdx + 2] = (b << 3) | (b >> 2);
-              imageData[dstIdx + 3] = 255;
+              const srcR = (r << 3) | (r >> 2);
+              const srcG = (g << 2) | (g >> 4);
+              const srcB = (b << 3) | (b >> 2);
+
+              const srcA = opacity;
+              if (srcA > 0) {
+                const dstA = imageData[dstIdx + 3] / 255;
+                const outA = srcA + dstA * (1 - srcA);
+
+                imageData[dstIdx] = Math.round(
+                  (srcR * srcA + imageData[dstIdx] * dstA * (1 - srcA)) / outA,
+                );
+                imageData[dstIdx + 1] = Math.round(
+                  (srcG * srcA + imageData[dstIdx + 1] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 2] = Math.round(
+                  (srcB * srcA + imageData[dstIdx + 2] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 3] = Math.round(outA * 255);
+              }
             }
           }
         }
@@ -615,7 +666,7 @@
       // Render 8-bit indexed color using palette
       function renderIndexed(imageData, cel, ase) {
         if (!ase.palette || !ase.palette.colors) {
-          renderRGBA(imageData, cel, ase); // fallback
+          renderRGBA(imageData, cel, ase);
           return;
         }
 
@@ -627,20 +678,47 @@
         const xPos = cel.xpos;
         const yPos = cel.ypos;
         const palette = ase.palette.colors;
+        const opacity = cel.opacity / 255;
 
-        for (let y = 0; y < celHeight && yPos + y < height; y++) {
-          for (let x = 0; x < celWidth && xPos + x < width; x++) {
+        for (let y = 0; y < celHeight; y++) {
+          const canvasY = yPos + y;
+          if (canvasY < 0 || canvasY >= height) continue;
+
+          for (let x = 0; x < celWidth; x++) {
+            const canvasX = xPos + x;
+            if (canvasX < 0 || canvasX >= width) continue;
+
             const srcIdx = y * celWidth + x;
-            const dstIdx = ((yPos + y) * width + (xPos + x)) * 4;
+            const dstIdx = (canvasY * width + canvasX) * 4;
 
             if (srcIdx < celData.length && dstIdx + 3 < imageData.length) {
               const colorIdx = celData[srcIdx];
-              const color = palette[colorIdx] || { r: 0, g: 0, b: 0, a: 255 };
+              const color = palette[colorIdx];
+              if (!color) continue;
 
-              imageData[dstIdx] = color.r || 0;
-              imageData[dstIdx + 1] = color.g || 0;
-              imageData[dstIdx + 2] = color.b || 0;
-              imageData[dstIdx + 3] = color.a !== undefined ? color.a : 255;
+              const srcA =
+                ((color.a !== undefined ? color.a : 255) / 255) * opacity;
+              if (srcA > 0) {
+                const dstA = imageData[dstIdx + 3] / 255;
+                const outA = srcA + dstA * (1 - srcA);
+
+                imageData[dstIdx] = Math.round(
+                  ((color.r || 0) * srcA +
+                    imageData[dstIdx] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 1] = Math.round(
+                  ((color.g || 0) * srcA +
+                    imageData[dstIdx + 1] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 2] = Math.round(
+                  ((color.b || 0) * srcA +
+                    imageData[dstIdx + 2] * dstA * (1 - srcA)) /
+                    outA,
+                );
+                imageData[dstIdx + 3] = Math.round(outA * 255);
+              }
             }
           }
         }
@@ -670,23 +748,40 @@
           }
 
           const firstFrame = ase.frames[0];
-          if (firstFrame.cels.length > 0) {
-            const cel = firstFrame.cels[0];
-            if (cel.rawCelData && cel.rawCelData.length > 0) {
-              // Render based on color depth
-              if (ase.colorDepth === 32) {
-                // 32-bit RGBA - data is already RGBA
-                renderRGBA(data, cel, ase);
-              } else if (ase.colorDepth === 16) {
-                // 16-bit - convert to RGBA
-                renderRGB16(data, cel, ase);
-              } else if (ase.colorDepth === 8 && ase.palette) {
-                // 8-bit indexed - use palette
-                renderIndexed(data, cel, ase);
-              } else {
-                // Fallback: treat as RGBA
-                renderRGBA(data, cel, ase);
-              }
+          console.log(
+            `Rendering frame with ${firstFrame.cels.length} CELs, ${ase.layers.length} layers`,
+          );
+
+          // Render all cels (layers) in the frame
+          for (let celIdx = 0; celIdx < firstFrame.cels.length; celIdx++) {
+            const cel = firstFrame.cels[celIdx];
+
+            if (!cel.rawCelData || cel.rawCelData.length === 0) {
+              console.log(`CEL ${celIdx}: No pixel data`);
+              continue;
+            }
+
+            // Get corresponding layer info
+            const layer = ase.layers[cel.layerIndex];
+            const isVisible = !layer || layer.flags.visible;
+            console.log(
+              `CEL ${celIdx}: Layer ${cel.layerIndex}, pos(${cel.xpos},${cel.ypos}), size(${cel.w}x${cel.h}), visible=${isVisible}, opacity=${cel.opacity}`,
+            );
+
+            if (layer && !layer.flags.visible) {
+              console.log(`  -> Skipping invisible layer`);
+              continue;
+            }
+
+            // Render based on color depth
+            if (ase.colorDepth === 32) {
+              renderRGBA(data, cel, ase);
+            } else if (ase.colorDepth === 16) {
+              renderRGB16(data, cel, ase);
+            } else if (ase.colorDepth === 8 && ase.palette) {
+              renderIndexed(data, cel, ase);
+            } else {
+              renderRGBA(data, cel, ase);
             }
           }
 
@@ -699,6 +794,8 @@
             height: ase.height,
             frameCount: ase.frames.length,
             colorDepth: ase.colorDepth,
+            celCount: firstFrame.cels.length,
+            layerCount: ase.layers.length,
           });
         } catch (error) {
           showStatus(`✗ Error: ${error.message}`, "error");
