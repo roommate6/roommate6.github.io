@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Roommate's Portfolio</title>
+    <title>Unorganized | Roommate's Portfolio</title>
 
     <link rel="icon" type="image/svg+xml" href="assets/main/logo.svg" />
     <link rel="stylesheet" href="css/style.css" />
@@ -19,7 +19,7 @@
             alt="Roommate"
           />
         </a>
-        <div class="main-top-bar-text no-select">Roommate</div>
+        <div class="main-top-bar-text no-select">Unorganized</div>
         <button class="main-top-bar-burger-button" id="mainTopBarBurgerButton">
           <img
             class="main-top-bar-burger-image no-select"
@@ -61,47 +61,16 @@
             >
           </div>
         </div>
-        <div class="index-my-description-container">
-          <p class="index-my-description">
-            I'm Roommate, and this is my online space.<br /><br />This site is
-            for sharing information with the public and for storing personal
-            notes.<br /><br />Right now, I'm trying to build a community with a
-            friend (Lnor) around game development on the Roblox platform.<br /><br />Years
-            since created: 24.<br />Sex: Male.<br />Race: Human.<br /><br />Visit my socials:
-          </p>
-        </div>
-        <a
-          href="https://discord.gg/QcSSWYf86u"
-          class="index-discord-container"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            class="index-discord no-select"
-            src="assets/main/discord.svg"
-            alt="Discord"
-          />
-          <div class="index-discord-text no-select">
-            Noor Studio Discord Server
-          </div>
-        </a>
-        <a
-          href="https://www.youtube.com/@Roommate-Dev"
-          class="index-youtube-container"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img
-            class="index-youtube no-select"
-            src="assets/main/youtube.svg"
-            alt="YouTube"
-          />
-          <div class="index-youtube-text no-select">My YouTube Channel</div>
-        </a>
+
+        <section class="projects-section">
+          <div class="projects-list" id="projectsList"></div>
+        </section>
       </div>
     </div>
 
     <script src="js/navigationMenu.js"></script>
+    <script src="js/projectCardsGenerator.js"></script>
+    <script src="js/unorganized.js"></script>
 
     <!-- Cloudflare Web Analytics -->
     <script

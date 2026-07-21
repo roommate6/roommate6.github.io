@@ -1,14 +1,6 @@
 const projects = [
   {
-    medias: [
-      "assets/images/pic1_1.webp",
-      "assets/images/pic1_2.webp",
-      "assets/images/pic1_3.webp",
-      "assets/images/pic1_4.webp",
-      "assets/images/pic1_5.webp",
-      "assets/images/pic1_6.webp",
-      "assets/videos/pic1_1.mp4",
-    ],
+    pathToMediaFolder: "assets/media_packs/embedded_pic_1",
     title: "PIC Microcontroller Hydraulic Press Controller",
     startDate: "2025-01",
     endDate: "2025-02",
