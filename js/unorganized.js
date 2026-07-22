@@ -1,5 +1,11 @@
 const projects = [
   {
+    pathToMediaFolder: "assets/media_packs/game_dev_meet_1",
+    title: "A game dev meet in Ploiesti, Romania",
+    startDate: "2025",
+    description: "We presented our Roblox game: Battle-Quest."
+  },
+  {
     pathToMediaFolder: "assets/media_packs/desktop_2026_1",
     title: "Random Images From My Desktop",
     startDate: "2026",
