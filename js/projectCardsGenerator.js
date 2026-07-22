@@ -6,6 +6,7 @@ function renderMedia(mediaPath) {
   const isImage = ["png", "jpg", "jpeg", "gif", "svg", "webp"].includes(
     extension,
   );
+  const isAseprite = ["ase", "aseprite"].includes(extension);
 
   if (isVideo) {
     return `
@@ -21,6 +22,18 @@ function renderMedia(mediaPath) {
         <img class="project-media" src="${mediaPath}" alt="${fileName}" />
       </a>
     `;
+  }
+
+  if (isAseprite) {
+    return `
+    <a class="project-media-link" href="${mediaPath}" target="_blank" rel="noopener noreferrer">
+      <canvas 
+        class="project-media aseprite-preview"
+        data-aseprite-src="${mediaPath}"
+        aria-label="${fileName}">
+      </canvas>
+    </a>
+  `;
   }
 
   return `
@@ -159,6 +172,20 @@ function initProjectMediaCarousels() {
   });
 }
 
+async function initAsepritePreviews() {
+  const previews = document.querySelectorAll(".aseprite-preview");
+
+  for (const canvas of previews) {
+    const src = canvas.dataset.asepriteSrc;
+
+    try {
+      await loadAsepritePreviewFromUrlOnCanvas(src, canvas);
+    } catch (error) {
+      console.log("Failed loading aseprite file:", src, error);
+    }
+  }
+}
+
 async function renderProjects(htmlProjectsListElement, projects) {
   const cards = await Promise.all(
     projects.map(async (project) => {
@@ -216,4 +243,5 @@ async function renderProjects(htmlProjectsListElement, projects) {
 
   htmlProjectsListElement.innerHTML = cards.join("");
   initProjectMediaCarousels();
+  initAsepritePreviews();
 }
