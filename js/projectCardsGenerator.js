@@ -7,6 +7,9 @@ function renderMedia(mediaPath) {
     extension,
   );
   const isAseprite = ["ase", "aseprite"].includes(extension);
+  const isAudio = ["mp3", "wav", "ogg", "flac", "m4a", "aac"].includes(
+    extension,
+  );
 
   if (isVideo) {
     return `
@@ -22,6 +25,25 @@ function renderMedia(mediaPath) {
         <img class="project-media" src="${mediaPath}" alt="${fileName}" />
       </a>
     `;
+  }
+
+  if (isAudio) {
+    return `
+    <div class="project-audio-card">
+      <button
+        class="project-audio-play"
+        data-audio-src="${mediaPath}"
+        aria-label="Play ${fileName}">
+        ▶
+      </button>
+
+      <div class="project-audio-info">
+        <div class="project-audio-name">${fileName}</div>
+      </div>
+
+      <audio preload="metadata" src="${mediaPath}"></audio>
+    </div>
+  `;
   }
 
   if (isAseprite) {
@@ -172,6 +194,49 @@ function initProjectMediaCarousels() {
   });
 }
 
+function initProjectAudioPlayers() {
+  document.querySelectorAll(".project-audio-card").forEach((card) => {
+    const button = card.querySelector(".project-audio-play");
+    const audio = card.querySelector("audio");
+
+    if (!button || !audio) return;
+
+    button.addEventListener("click", () => {
+      // pause every other player
+      document.querySelectorAll(".project-audio-card audio").forEach((a) => {
+        if (a !== audio) {
+          a.pause();
+          a.currentTime = 0;
+        }
+      });
+
+      document.querySelectorAll(".project-audio-play").forEach((b) => {
+        b.textContent = "▶";
+      });
+
+      if (audio.paused) {
+        audio.play();
+        button.textContent = "⏸";
+      } else {
+        audio.pause();
+        button.textContent = "▶";
+      }
+    });
+
+    audio.addEventListener("ended", () => {
+      button.textContent = "▶";
+    });
+
+    audio.addEventListener("pause", () => {
+      button.textContent = "▶";
+    });
+
+    audio.addEventListener("play", () => {
+      button.textContent = "⏸";
+    });
+  });
+}
+
 async function initAsepritePreviews() {
   const previews = document.querySelectorAll(".aseprite-preview");
 
@@ -243,5 +308,6 @@ async function renderProjects(htmlProjectsListElement, projects) {
 
   htmlProjectsListElement.innerHTML = cards.join("");
   initProjectMediaCarousels();
+  initProjectAudioPlayers();
   initAsepritePreviews();
 }

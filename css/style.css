@@ -428,6 +428,47 @@ html::-webkit-scrollbar {
   border: 0.1vh dashed #667278;
 }
 
+.project-audio-card {
+    width: 100%;
+    height: 100%;
+    min-height: 220px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    gap: 18px;
+
+    background: var(--card-background);
+    border-radius: 10px;
+}
+
+.project-audio-play {
+    width: 72px;
+    height: 72px;
+
+    border-radius: 50%;
+    border: none;
+
+    cursor: pointer;
+
+    font-size: 30px;
+}
+
+.project-audio-name {
+    max-width: 90%;
+
+    text-align: center;
+
+    overflow-wrap: anywhere;
+    font-weight: 600;
+}
+
+.project-audio-card audio {
+    display: none;
+}
+
 .project-title {
   font-family: "Silkscreen", monospace;
   font-size: 2.2vh;
